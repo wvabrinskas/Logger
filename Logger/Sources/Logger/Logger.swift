@@ -13,7 +13,7 @@ public enum LogType: String {
   
   /// Prefix to add to log statement
   /// - Returns: String to prepend
-  func prefix() -> String {
+  public func prefix() -> String {
     let suffix = self.rawValue.uppercased()
     switch self {
     case .Error:
@@ -29,7 +29,7 @@ public enum LogType: String {
   
   /// Log type for system
   /// - Returns: OSLogType
-  func osLogType() -> OSLogType {
+  public func osLogType() -> OSLogType {
     switch self {
     case .Error:
       return .error
@@ -45,7 +45,7 @@ public enum LogType: String {
   /// Determines whether logs should be shown
   /// - Parameter level: Adjusts for log level
   /// - Returns: Bool that determines if you should show a log type
-  func canShow(for level: LogLevel) -> Bool {
+  public func canShow(for level: LogLevel) -> Bool {
     switch level {
     case .none:
       return false
@@ -85,26 +85,26 @@ public protocol Logger {
   func log(type: LogType, message: String)
 }
 
-extension Logger {
-  public var logLevel: LogLevel {
+public extension Logger {
+  var logLevel: LogLevel {
     get {
       return .high
     }
   }
   
-  public static var osLogger: OSLog {
+  static var osLogger: OSLog {
     get {
       let identifier = Bundle.main.bundleIdentifier ?? "logger_log"
       return OSLog(subsystem: "\(identifier).logger.plist", category: "\(identifier)-log")
     }
   }
   
-  public static func log(type: LogType, message: String) {
+  static func log(type: LogType, message: String) {
     let message = "\(type.prefix()) - \(message)"
     os_log("%@", log: osLogger, type: type.osLogType(), message)
   }
   
-  public func log(type: LogType, message: String) {
+  func log(type: LogType, message: String) {
     if type.canShow(for: self.logLevel) {
       let message = "\(type.prefix()) - \(message)"
       os_log("%@", log: Self.osLogger, type: type.osLogType(), message)
