@@ -53,11 +53,11 @@ public enum LogType: String {
     
     switch priority {
     case .low:
-      return level.rawValue > LogLevel.low.rawValue
+      return level.rawValue >= LogLevel.low.rawValue
     case .medium:
-      return level.rawValue > LogLevel.medium.rawValue
+      return level.rawValue >= LogLevel.medium.rawValue
     case .high:
-      return level.rawValue > LogLevel.high.rawValue
+      return level.rawValue >= LogLevel.high.rawValue
     case .alwaysShow:
       return true
     }
