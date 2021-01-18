@@ -81,8 +81,8 @@ public enum LogLevel: Int {
 public protocol Logger: class {
   static var osLogger: OSLog { get }
   var logLevel: LogLevel { get set }
-  static func log(type: LogType, message: String)
-  func log(type: LogType, message: String)
+  static func log(type: LogType, priority: LogPriority, message: String)
+  func log(type: LogType, priority: LogPriority, message: String)
 }
 
 public extension Logger {
