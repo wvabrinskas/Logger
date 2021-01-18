@@ -1,2 +1,3 @@
 # Logger
-Swift logging service
+
+A description of this package.
