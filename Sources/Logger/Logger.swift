@@ -2,27 +2,25 @@
 import Foundation
 import os
 
+public enum LogPriority: String {
+  case low, medium, high, alwaysShow
+}
+
 /// Type of adkit log
 public enum LogType: String {
   
-  case Error
-  case Success
-  case TimeOut
-  case Loading
-  case Message
-  
+  case error, success, message
+
   /// Prefix to add to log statement
   /// - Returns: String to prepend
   public func prefix() -> String {
     let suffix = self.rawValue.uppercased()
     switch self {
-    case .Error:
+    case .error:
       return "🔴 \(suffix): "
-    case .Success:
+    case .success:
       return "🟢 \(suffix):"
-    case .TimeOut:
-      return "⏱ \(suffix):"
-    case .Loading, .Message:
+    case .message:
       return "🟡 \(suffix):"
     }
   }
@@ -31,32 +29,37 @@ public enum LogType: String {
   /// - Returns: OSLogType
   public func osLogType() -> OSLogType {
     switch self {
-    case .Error:
+    case .error:
       return .error
-    case .Success:
+    case .success:
       return .default
-    case .TimeOut:
-      return .fault
-    case .Loading, .Message:
+    case .message:
       return .info
     }
   }
   
   /// Determines whether logs should be shown
-  /// - Parameter level: Adjusts for log level
-  /// - Returns: Bool that determines if you should show a log type
-  public func canShow(for level: LogLevel) -> Bool {
-    switch level {
-    case .none:
+
+  
+  /// Determins whether logs should be shown
+  /// - Parameters:
+  ///   - priority: The priority of the current message
+  ///   - level: The overall level of the logger, will effectively filter messages
+  /// - Returns: Whether or not to show the message
+  public func canShow(for priority: LogPriority, for level: LogLevel) -> Bool {
+    guard level != .none else {
       return false
+    }
+    
+    switch priority {
     case .low:
-      return self == .Success
+      return level.rawValue > LogLevel.low.rawValue
     case .medium:
-      return self == .Success || self == .Loading
+      return level.rawValue > LogLevel.medium.rawValue
     case .high:
+      return level.rawValue > LogLevel.high.rawValue
+    case .alwaysShow:
       return true
-    case .timeout:
-      return self == .TimeOut
     }
   }
 }
@@ -73,9 +76,6 @@ public enum LogLevel: Int {
   
   //show all logs
   case high
-  
-  //show timeout only logs
-  case timeout
 }
 
 public protocol Logger: class {
@@ -99,13 +99,13 @@ public extension Logger {
     }
   }
   
-  static func log(type: LogType, message: String) {
+  static func log(type: LogType, priority: LogPriority = .low, message: String) {
     let message = "\(type.prefix()) - \(message)"
     os_log("%@", log: osLogger, type: type.osLogType(), message)
   }
   
-  func log(type: LogType, message: String) {
-    if type.canShow(for: self.logLevel) {
+  func log(type: LogType, priority: LogPriority = .low, message: String) {
+    if type.canShow(for: priority, for: self.logLevel) {
       let message = "\(type.prefix()) - \(message)"
       os_log("%@", log: Self.osLogger, type: type.osLogType(), message)
     }
