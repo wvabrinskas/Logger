@@ -78,7 +78,7 @@ public enum LogLevel: Int {
   case timeout
 }
 
-public protocol Logger {
+public protocol Logger: class {
   static var osLogger: OSLog { get }
   var logLevel: LogLevel { get set }
   static func log(type: LogType, message: String)
