@@ -47,6 +47,10 @@ public enum LogType: String {
   ///   - level: The overall level of the logger, will effectively filter messages
   /// - Returns: Whether or not to show the message
   public func canShow(for priority: LogPriority, for level: LogLevel) -> Bool {
+    if priority == .alwaysShow {
+      return true
+    }
+    
     guard level != .none else {
       return false
     }
@@ -65,7 +69,7 @@ public enum LogType: String {
 }
 
 public enum LogLevel: Int {
-  //show no ad logs
+  //show no logs
   case none
   
   //show only success logs
