@@ -82,7 +82,7 @@ public enum LogLevel: Int {
   case high
 }
 
-public protocol Logger: class {
+public protocol Logger {
   static var osLogger: OSLog { get }
   var logLevel: LogLevel { get set }
   static func log(type: LogType, priority: LogPriority, message: String)
